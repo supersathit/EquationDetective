@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สำนักงานนักสืบสมการ - แฟ้มเบาะแสความรู้</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Mali', cursive;
+      background-color: #1A1A2E;
+      color: #ECDBBA;
+      overflow-x: hidden;
+    }
+
+    /* กล่องแฟ้มสไลด์อัตราส่วน 16:9 */
+    .slide-container {
+      position: relative;
+      background: #F2EDD7; /* สีกระดาษเอกสารเก่า */
+      border: 6px solid #ECDBBA;
+      border-radius: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      max-w: 960px;
+      overflow: hidden;
+    }
+
+    .slide-item {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* ป้องกันภาพบิดเบี้ยวและรักษาอัตราส่วน 16:9 */
+      display: none;
+    }
+
+    .slide-item.active {
+      display: block;
+      animation: slideFade 0.4s ease-in-out;
+    }
+
+    @keyframes slideFade {
+      from { opacity: 0; transform: scale(0.99); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* ปุ่มควบคุมสไตล์ย้อนยุค */
+    .control-btn {
+      background: #C84B31;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 20px;
+      font-weight: 700;
+      transition: all 0.2s;
+      border-bottom: 4px solid #752A19;
+    }
+
+    .control-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    .control-btn:active {
+      transform: translateY(2px);
+      border-bottom-width: 0px;
+    }
+
+    .control-btn:disabled {
+      background: #475569;
+      border-bottom-color: #1e293b;
+      cursor: not-allowed;
+      opacity: 0.5;
+      transform: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-6 select-none">
+
+  <div class="w-full max-w-5xl flex flex-col sm:flex-row justify-between items-center gap-4 my-2">
+    <a href="index.html" class="control-btn !bg-[#2D4263] !border-[#0F0F1A] flex items-center gap-2 text-base shadow-md">
+      <span>⬅️</span> กลับหน้าแรก
+    </a>
+    <div class="text-center">
+      <h1 class="text-2xl md:text-3xl font-black text-[#ECDBBA] tracking-wide flex items-center justify-center gap-2">
+        <span>📁</span> แฟ้มคดีลับ: สำนักงานนักสืบสมการ
+      </h1>
+    </div>
+    <div class="hidden sm:block w-[150px]"></div>
+  </div>
+
+  <div class="w-full max-w-4xl px-2 my-auto">
+    <div class="slide-container" id="slideArea">
+      
+      <img src="images/slide1.jpg" class="slide-item active" alt="หน้า 1">
+      <img src="images/slide2.jpg" class="slide-item" alt="หน้า 2">
+      <img src="images/slide3.jpg" class="slide-item" alt="หน้า 3">
+      <img src="images/slide4.jpg" class="slide-item" alt="หน้า 4">
+      <img src="images/slide5.jpg" class="slide-item" alt="หน้า 5">
+      <img src="images/slide6.jpg" class="slide-item" alt="หน้า 6">
+      <img src="images/slide7.jpg" class="slide-item" alt="หน้า 7">
+      <img src="images/slide8.jpg" class="slide-item" alt="หน้า 8">
+      <img src="images/slide9.jpg" class="slide-item" alt="หน้า 9">
+      <img src="images/slide10.jpg" class="slide-item" alt="หน้า 10">
+      <img src="images/slide11.jpg" class="slide-item" alt="หน้า 11">
+      <img src="images/slide12.jpg" class="slide-item" alt="หน้า 12">
+      <img src="images/slide13.jpg" class="slide-item" alt="หน้า 13">
+
+      <div class="absolute bottom-0 left-0 w-full h-2 bg-[#2D4263]/30">
+        <div id="progressBar" class="h-full bg-gradient-to-r from-[#C84B31] to-[#ECDBBA] transition-all duration-300" style="width: 7.69%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full max-w-md flex flex-col items-center gap-3 mt-4 mb-2">
+    <div class="flex items-center justify-between w-full gap-4">
+      
+      <button onclick="moveSlide(-1)" id="prevBtn" class="control-btn flex-1 text-base md:text-lg flex items-center justify-center gap-1">
+        <span>◀️</span> ก่อนหน้า
+      </button>
+      
+      <div class="bg-[#2D4263] px-5 py-2.5 rounded-2xl border-2 border-[#ECDBBA] font-black text-lg md:text-xl min-w-[110px] text-center shadow-inner">
+        <span id="pageNumber" class="text-[#C84B31]">1</span> / 13
+      </div>
+      
+      <button onclick="moveSlide(1)" id="nextBtn" class="control-btn flex-1 text-base md:text-lg flex items-center justify-center gap-1">
+        ถัดไป <span>▶️</span>
+      </button>
+      
+    </div>
+    <p class="text-[#ECDBBA]/50 text-xs md:text-sm text-center italic mt-1">
+      💡 คำแนะนำ: สามารถใช้ปุ่มลูกศร ⬅️ ➡️ บนคีย์บอร์ด หรือปัดหน้าจอบนมือถือเพื่อเปลี่ยนหน้าได้
+    </p>
+  </div>
+
+  <div class="fixed bottom-6 left-6 opacity-10 hidden lg:block pointer-events-none select-none text-7xl">☕</div>
+  <div class="fixed top-24 right-10 opacity-10 hidden lg:block pointer-events-none select-none text-7xl">🔎</div>
+
+  <script>
+    let currentSlideIdx = 0;
+    const allSlides = document.querySelectorAll('.slide-item');
+    const totalSlidesCount = allSlides.length;
+    
+    const pageNumDisplay = document.getElementById('pageNumber');
+    const progressBarFill = document.getElementById('progressBar');
+    const prevButton = document.getElementById('prevBtn');
+    const nextButton = document.getElementById('nextBtn');
+    const slideArea = document.getElementById('slideArea');
+
+    // ฟังก์ชันสำหรับเปลี่ยนหน้าสไลด์
+    function moveSlide(direction) {
+      // ซ่อนสไลด์หน้าปัจจุบันออกไปก่อน
+      allSlides[currentSlideIdx].classList.remove('active');
+      
+      // คำนวณดัชนีหน้าใหม่
+      currentSlideIdx += direction;
+      
+      // ป้องกันการทะลุขอบเขตข้อมูล
+      if (currentSlideIdx < 0) currentSlideIdx = 0;
+      if (currentSlideIdx >= totalSlidesCount) currentSlideIdx = totalSlidesCount - 1;
+      
+      // แสดงสไลด์หน้าใหม่ขึ้นมา
+      allSlides[currentSlideIdx].classList.add('active');
+      
+      // อัปเดตส่วนควบคุมต่างๆ
+      renderUI();
+    }
+
+    // ฟังก์ชันจัดการสถานะปุ่มและตัวเลขบนหน้าจอ
+    function renderUI() {
+      // อัปเดตตัวเลขหน้า
+      pageNumDisplay.innerText = currentSlideIdx + 1;
+      
+      // คำนวณและอัปเดตแถบความคืบหน้า (Progress Bar)
+      const progressPercent = ((currentSlideIdx + 1) / totalSlidesCount) * 100;
+      progressBarFill.style.width = `${progressPercent}%`;
+      
+      // ตรวจสอบและเปิด/ปิดการใช้งานปุ่มให้สัมพันธ์กับหน้าข้อมูล
+      prevButton.disabled = (currentSlideIdx === 0);
+      nextButton.disabled = (currentSlideIdx === totalSlidesCount - 1);
+    }
+
+    // ระบบที่ 1: รองรับการกดผ่านแป้นพิมพ์คอมพิวเตอร์ (Keyboard)
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') moveSlide(-1);
+      if (event.key === 'ArrowRight') moveSlide(1);
+    });
+
+    // ระบบที่ 2: รองรับระบบสัมผัสปัดหน้าจอบนอุปกรณ์พกพา (Touch Swipe Gestures)
+    let touchStartXPoint = 0;
+    let touchEndXPoint = 0;
+
+    slideArea.addEventListener('touchstart', (event) => {
+      touchStartXPoint = event.changedTouches[0].screenX;
+    }, { passive: true });
+
+    slideArea.addEventListener('touchend', (event) => {
+      touchEndXPoint = event.changedTouches[0].screenX;
+      handleSwipeLogic();
+    }, { passive: true });
+
+    function handleSwipeLogic() {
+      const swipeDistanceThreshold = 50; // ระยะการปัดขั้นต่ำเป็นพิกเซลเพื่อป้องกันการลั่น
+      
+      // ปัดนิ้วไปทางซ้าย -> หน้าถัดไป
+      if (touchStartXPoint - touchEndXPoint > swipeDistanceThreshold) {
+        moveSlide(1);
+      }
+      // ปัดนิ้วไปทางขวา -> หน้าก่อนหน้า
+      if (touchEndXPoint - touchStartXPoint > swipeDistanceThreshold) {
+        moveSlide(-1);
+      }
+    }
+
+    // เรียกใช้งานฟังก์ชันจัดการสถานะครั้งแรกเพื่อเริ่มต้นระบบ
+    renderUI();
+  </script>
+
+</body>
+</html>

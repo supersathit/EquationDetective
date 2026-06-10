@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ยอดนักสืบสมการ ม.1: ไขปริศนาคณิตศาสตร์</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Mali', cursive;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    button, canvas {
+      touch-action: manipulation;
+    }
+    @keyframes jelly {
+      0%, 100% { transform: scale(1); }
+      30% { transform: scale(1.15, 0.85); }
+      40% { transform: scale(0.85, 1.15); }
+      50% { transform: scale(1.05, 0.95); }
+      65% { transform: scale(0.98, 1.02); }
+      75% { transform: scale(1.02, 0.98); }
+    }
+    .jelly-hover:hover { animation: jelly 0.6s ease-in-out; }
+    @keyframes floating {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .float-animation { animation: floating 3s ease-in-out infinite; }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .heart-active { animation: heartbeat 1.2s infinite ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px) rotate(-1deg); }
+      75% { transform: translateX(6px) rotate(1deg); }
+    }
+    .shake-animation { animation: shake 0.15s ease-in-out 2; }
+    @keyframes drift {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(100vw); }
+    }
+    .cloud-slow { animation: drift 120s linear infinite; }
+  </style>
+</head>
+<body class="bg-[#1A1A2E] overflow-hidden w-screen h-screen flex flex-col justify-center items-center relative select-none">
+
+  <div id="startMenu" class="absolute inset-0 bg-gradient-to-br from-[#2D4263] via-[#1A1A2E] to-[#C84B31] z-50 flex flex-col justify-center items-center p-4 overflow-y-auto">
+    <div class="absolute top-10 left-[-200px] cloud-slow opacity-20 text-6xl">☁️</div>
+    <div class="absolute top-40 left-[-400px] cloud-slow opacity-10 text-8xl" style="animation-delay: -30s; animation-duration: 90s;">☁️</div>
+
+    <div class="bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-[40px] shadow-[0_20px_50px_rgba(200,75,49,0.3)] max-w-lg w-full border-[6px] border-[#ECDBBA] text-center flex flex-col gap-4 transform transition-all relative">
+      
+      <div class="relative py-2">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-[#C84B31] drop-shadow-[0_4px_0_#ECDBBA] tracking-wide float-animation">
+          🕵️ ยอดนักสืบสมการ
+        </h1>
+        <p class="text-[#2D4263] text-sm md:text-base font-bold bg-[#ECDBBA] px-4 py-1.5 rounded-full inline-block mt-2 shadow-inner">
+          ✨ ตอน: ไขปริศนาสมการ ม.1 ✨
+        </p>
+      </div>
+      
+      <div class="flex justify-center items-center gap-6 my-2 bg-gradient-to-b from-[#F2EDD7] to-[#E3DEC3] py-3 rounded-3xl border-2 border-[#C84B31]">
+        <div class="text-center">
+          <p class="text-xs text-[#2D4263] font-bold mb-1">บัตรประจำตัว</p>
+          <div class="relative w-20 h-20 mx-auto bg-[#2D4263] rounded-3xl border-4 border-[#ECDBBA] flex items-center justify-center text-4xl shadow-md heart-active">
+            <span id="previewHat" class="absolute -top-3 text-4xl">🕵️</span>
+            <span class="mt-4">🧐</span>
+          </div>
+        </div>
+        <div class="text-left text-xs text-[#2D4263] space-y-1 max-w-[180px]">
+          <p class="font-bold text-sm text-[#C84B31]" id="previewName">นักสืบฝึกหัด</p>
+          <p>• พลังใจ: ❤️❤️❤️</p>
+          <p>• ทักษะ: สังเกตและวิเคราะห์</p>
+          <p>• ไอเท็ม: แว่นขยายค้นหาความจริง 🔎</p>
+        </div>
+      </div>
+
+      <div class="text-left">
+        <label class="block text-[#2D4263] font-bold mb-1 text-sm flex items-center gap-1">
+          <span>📝</span> ชื่อรหัสประจำตัว:
+        </label>
+        <input type="text" id="playerNameInput" value="นักสืบฝึกหัด" 
+               class="w-full px-4 py-2.5 rounded-2xl border-4 border-[#ECDBBA] focus:border-[#C84B31] focus:outline-none text-[#2D4263] font-bold shadow-inner text-center text-lg bg-white/90"
+               onclick="this.select()">
+      </div>
+
+      <div class="text-left">
+        <label class="block text-[#2D4263] font-bold mb-2 text-sm flex items-center gap-1">
+          <span>🎭</span> เลือกตัวแทนนักสืบ:
+        </label>
+        <div class="grid grid-cols-5 gap-2">
+          <button type="button" onclick="selectAvatar('🕵️')" id="btnAvatar1" class="avatar-select-btn text-2xl p-2.5 bg-[#F2EDD7] rounded-2xl border-4 border-[#C84B31] transition-all transform hover:scale-105 active:scale-90">🕵️</button>
+          <button type="button" onclick="selectAvatar('👮')" id="btnAvatar2" class="avatar-select-btn text-2xl p-2.5 bg-white rounded-2xl border-4 border-transparent hover:bg-[#F2EDD7] transition-all transform hover:scale-105 active:scale-90">👮</button>
+          <button type="button" onclick="selectAvatar('🦉')" id="btnAvatar3" class="avatar-select-btn text-2xl p-2.5 bg-white rounded-2xl border-4 border-transparent hover:bg-[#F2EDD7] transition-all transform hover:scale-105 active:scale-90">🦉</button>
+          <button type="button" onclick="selectAvatar('🦊')" id="btnAvatar4" class="avatar-select-btn text-2xl p-2.5 bg-white rounded-2xl border-4 border-transparent hover:bg-[#F2EDD7] transition-all transform hover:scale-105 active:scale-90">🦊</button>
+          <button type="button" onclick="selectAvatar('🐱')" id="btnAvatar5" class="avatar-select-btn text-2xl p-2.5 bg-white rounded-2xl border-4 border-transparent hover:bg-[#F2EDD7] transition-all transform hover:scale-105 active:scale-90">🐱</button>
+        </div>
+      </div>
+
+      <div class="bg-[#F2EDD7] p-2.5 rounded-2xl border-2 border-[#ECDBBA] flex items-center justify-between text-xs text-[#2D4263]">
+        <span class="font-bold flex items-center gap-1">🎵 เสียงเพลงแห่งปริศนา:</span>
+        <button id="bgmToggleBtn" onclick="toggleBGM()" class="bg-[#C84B31] hover:bg-[#A33B24] text-white font-bold py-1 px-4 rounded-xl shadow-md transition-all active:scale-95">
+          🔊 เปิดอยู่
+        </button>
+      </div>
+
+      <button id="btnStart" class="bg-gradient-to-r from-[#2D4263] via-[#1A1A2E] to-[#2D4263] hover:brightness-110 text-[#ECDBBA] font-black text-2xl py-4 px-10 rounded-[28px] shadow-[0_8px_0_#111122,0_15px_20px_rgba(45,66,99,0.4)] active:translate-y-2 active:shadow-[0_2px_0_#111122] transition-all duration-75 border-2 border-[#ECDBBA] jelly-hover">
+        เริ่มสืบคดีกันเลย! 🔎🚀
+      </button>
+      <a href="index.html" class="bg-[#ECDBBA] hover:bg-[#F2EDD7] text-[#2D4263] font-bold text-sm md:text-base py-4 px-4 rounded-[20px] shadow-[0_4px_0_#A3947A] active:translate-y-1 active:shadow-[0_2px_0_#A3947A] transition-all border-2 border-[#2D4263] flex items-center gap-2 z-20 jelly-hover">
+        <span>🔙</span> ย้อนกลับ
+      </a>
+    </div>
+  </div>
+
+  <div id="questionOverlay" class="absolute inset-0 bg-black/70 z-40 hidden flex justify-center items-center p-4">
+    <div id="questionBox" class="bg-white p-6 md:p-8 rounded-[40px] shadow-[0_25px_50px_rgba(0,0,0,0.5)] max-w-2xl w-full border-[8px] border-[#2D4263] text-center flex flex-col gap-4 transform transition-all">
+      <div class="flex justify-between items-center border-b-4 border-dashed border-[#2D4263] pb-3">
+        <span class="text-[#C84B31] text-lg font-bold flex items-center gap-1">📁 พบเบาะแสปริศนา!</span>
+        <span id="questionIndexText" class="bg-[#2D4263] text-[#ECDBBA] px-4 py-1.5 rounded-full text-xs font-black shadow-inner">คดีที่ 1/20</span>
+      </div>
+      
+      <p id="questionText" class="text-2xl md:text-3xl text-[#1A1A2E] font-black py-4 leading-relaxed">กำลังอ่านเบาะแส...</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" id="choiceContainer">
+        <button onclick="submitAnswer(0)" id="choice0" class="choice-btn w-full text-left md:text-lg font-bold px-4 py-3 rounded-3xl border-4 border-[#ECDBBA] hover:border-[#C84B31] hover:bg-[#F2EDD7] transition-all flex items-center gap-3 bg-white text-[#1A1A2E] shadow-sm active:scale-95">
+          <span class="bg-[#2D4263] text-[#ECDBBA] min-w-[36px] h-9 rounded-2xl flex items-center justify-center font-black">ก</span>
+          <span id="choice0Text" class="flex-1 break-words">ตัวเลือกที่ 1</span>
+        </button>
+        <button onclick="submitAnswer(1)" id="choice1" class="choice-btn w-full text-left md:text-lg font-bold px-4 py-3 rounded-3xl border-4 border-[#ECDBBA] hover:border-[#C84B31] hover:bg-[#F2EDD7] transition-all flex items-center gap-3 bg-white text-[#1A1A2E] shadow-sm active:scale-95">
+          <span class="bg-[#2D4263] text-[#ECDBBA] min-w-[36px] h-9 rounded-2xl flex items-center justify-center font-black">ข</span>
+          <span id="choice1Text" class="flex-1 break-words">ตัวเลือกที่ 2</span>
+        </button>
+        <button onclick="submitAnswer(2)" id="choice2" class="choice-btn w-full text-left md:text-lg font-bold px-4 py-3 rounded-3xl border-4 border-[#ECDBBA] hover:border-[#C84B31] hover:bg-[#F2EDD7] transition-all flex items-center gap-3 bg-white text-[#1A1A2E] shadow-sm active:scale-95">
+          <span class="bg-[#2D4263] text-[#ECDBBA] min-w-[36px] h-9 rounded-2xl flex items-center justify-center font-black">ค</span>
+          <span id="choice2Text" class="flex-1 break-words">ตัวเลือกที่ 3</span>
+        </button>
+        <button onclick="submitAnswer(3)" id="choice3" class="choice-btn w-full text-left md:text-lg font-bold px-4 py-3 rounded-3xl border-4 border-[#ECDBBA] hover:border-[#C84B31] hover:bg-[#F2EDD7] transition-all flex items-center gap-3 bg-white text-[#1A1A2E] shadow-sm active:scale-95">
+          <span class="bg-[#2D4263] text-[#ECDBBA] min-w-[36px] h-9 rounded-2xl flex items-center justify-center font-black">ง</span>
+          <span id="choice3Text" class="flex-1 break-words">ตัวเลือกที่ 4</span>
+        </button>
+      </div>
+
+      <div id="explanationBanner" class="hidden rounded-3xl p-4 text-sm font-bold transition-all transform scale-95 duration-100">
+        <p id="explanationTitle" class="text-lg font-black mb-1"></p>
+        <p id="explanationDesc" class="text-sm leading-relaxed"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="victoryMenu" class="absolute inset-0 bg-black/80 z-50 hidden flex flex-col justify-center items-center p-4">
+    <div class="bg-white p-8 rounded-[40px] shadow-[0_20px_50px_rgba(236,219,186,0.4)] max-w-md w-full border-[8px] border-[#ECDBBA] text-center flex flex-col gap-5">
+      <h1 class="text-5xl font-black text-[#C84B31] drop-shadow-[0_2px_0_#2D4263] float-animation">🏆 ปิดคดีสำเร็จ 🏆</h1>
+      <p class="text-xl font-bold text-[#1A1A2E]">เยี่ยมมากนักสืบ <span id="victoryPlayerName" class="text-[#2D4263] font-black"></span></p>
+      <p class="text-md text-[#2D4263] font-semibold">คุณคือยอดนักสืบสมการตัวจริง!</p>
+      
+      <div class="bg-[#F2EDD7] p-5 rounded-3xl border-2 border-[#ECDBBA] flex flex-col gap-2">
+        <p class="text-[#2D4263] text-sm font-bold">สรุปผลการสืบสวน</p>
+        <div class="flex justify-around items-center">
+          <div>
+            <p class="text-xs text-slate-500">ไขปริศนาถูก</p>
+            <p class="text-2xl font-black text-[#C84B31]" id="victoryScore">📁 0/20</p>
+          </div>
+          <div class="w-[2px] h-8 bg-slate-300"></div>
+          <div>
+            <p class="text-xs text-slate-500">พบเบาะแสลับ</p>
+            <p class="text-2xl font-black text-[#2D4263]" id="victoryBonusStars">🔎 0 จุด</p>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="restartGame()" class="bg-gradient-to-r from-[#2D4263] to-[#1A1A2E] hover:brightness-110 text-[#ECDBBA] font-black text-xl py-4 px-8 rounded-3xl shadow-[0_6px_0_#0F0F1A] active:translate-y-1 active:shadow-[0_2px_0_#0F0F1A] transition-all">
+        รับคดีใหม่ 🔄
+      </button>
+    </div>
+  </div>
+
+  <div id="gameOverMenu" class="absolute inset-0 bg-black/80 z-50 hidden flex flex-col justify-center items-center p-4">
+    <div class="bg-white p-8 rounded-[40px] shadow-[0_20px_50px_rgba(200,75,49,0.4)] max-w-md w-full border-[8px] border-[#C84B31] text-center flex flex-col gap-5">
+      <h1 class="text-5xl font-black text-[#C84B31] drop-shadow-[0_2px_0_#ECDBBA] float-animation">🩹 เบาะแสหลุดลอย 🩹</h1>
+      <p class="text-lg text-[#1A1A2E] font-bold">ไม่ต้องเสียใจ กลับไปทบทวนข้อมูลมาใหม่นะ!</p>
+      
+      <div class="bg-[#FADCD5] p-4 rounded-3xl border-2 border-[#C84B31] flex justify-around">
+        <div>
+          <p class="text-xs text-[#A33B24]">ไขปริศนาได้</p>
+          <p class="text-2xl font-black text-[#A33B24]" id="gameOverScore">📁 0/20</p>
+        </div>
+        <div class="w-[2px] h-8 bg-slate-400"></div>
+        <div>
+          <p class="text-xs text-[#A33B24]">เบาะแสลับที่พบ</p>
+          <p class="text-2xl font-black text-[#A33B24]" id="gameOverStars">🔎 0 จุด</p>
+        </div>
+      </div>
+
+      <button onclick="restartGame()" class="bg-gradient-to-r from-[#C84B31] to-[#A33B24] hover:brightness-110 text-white font-black text-xl py-4 px-8 rounded-3xl shadow-[0_6px_0_#752A19] active:translate-y-1 active:shadow-[0_2px_0_#752A19] transition-all">
+        สืบคดีใหม่อีกครั้ง 🔄
+      </button>
+    </div>
+  </div>
+
+  <div class="absolute top-4 left-4 right-4 z-30 flex flex-col gap-2.5 pointer-events-none select-none">
+    <div class="flex justify-between items-center">
+      <div class="bg-white/90 px-4 py-2.5 rounded-[24px] shadow-md border-4 border-[#2D4263] flex items-center gap-3 backdrop-blur-sm pointer-events-auto">
+        <div class="bg-[#ECDBBA] w-11 h-11 rounded-2xl flex items-center justify-center border-2 border-[#C84B31] text-2xl relative">
+          <span id="hudAvatar">🕵️</span>
+        </div>
+        <div>
+          <p class="text-xs text-[#2D4263] font-extrabold" id="hudPlayerName">นักสืบฝึกหัด</p>
+          <div class="flex gap-1" id="hudHearts">
+            <span class="heart-active">❤️</span><span class="heart-active" style="animation-delay: 0.2s">❤️</span><span class="heart-active" style="animation-delay: 0.4s">❤️</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/90 px-4 py-2.5 rounded-[24px] shadow-md border-4 border-[#2D4263] flex items-center gap-4 backdrop-blur-sm pointer-events-auto">
+        <div class="text-center">
+          <p class="text-[10px] text-[#2D4263] font-bold">แฟ้มปริศนา</p>
+          <p class="font-black text-[#C84B31] text-sm md:text-base" id="hudScore">0/20</p>
+        </div>
+        <div class="w-[2px] h-6 bg-[#2D4263]"></div>
+        <div class="text-center">
+          <p class="text-[10px] text-[#2D4263] font-bold">เบาะแสลับ</p>
+          <p class="font-black text-[#2D4263] text-sm md:text-base" id="hudStarsCount">🔎 0</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full bg-[#1A1A2E] h-7 rounded-full border-4 border-[#2D4263] shadow-inner relative overflow-visible flex items-center backdrop-blur-sm pointer-events-auto px-1.5">
+      <div class="absolute left-1.5 text-xs text-white">🚦</div>
+      <div id="progressAvatar" class="absolute text-2xl transition-all duration-100 ease-out z-10 font-bold" style="left: 0%; transform: translateY(-3px);">🕵️</div>
+      <div class="absolute right-1.5 text-xl leading-none z-0">🏁</div>
+      <div id="progressBarFill" class="h-full bg-gradient-to-r from-[#2D4263] via-[#C84B31] to-[#ECDBBA] rounded-full transition-all duration-100 ease-out" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas" class="w-full h-full bg-[#1A1A2E] block z-10"></canvas>
+
+  <div id="touchControls" class="absolute bottom-6 left-6 right-6 z-30 flex justify-between items-center pointer-events-none select-none hidden">
+    <div class="flex gap-4 pointer-events-auto">
+      <button id="btnLeft" class="w-16 h-16 bg-gradient-to-b from-[#2D4263] to-[#1A1A2E] text-white text-3xl font-bold rounded-3xl border-4 border-[#ECDBBA] flex items-center justify-center active:translate-y-1 transition-all">⬅️</button>
+      <button id="btnRight" class="w-16 h-16 bg-gradient-to-b from-[#2D4263] to-[#1A1A2E] text-white text-3xl font-bold rounded-3xl border-4 border-[#ECDBBA] flex items-center justify-center active:translate-y-1 transition-all">➡️</button>
+    </div>
+    <div class="pointer-events-auto">
+      <button id="btnJump" class="w-20 h-16 bg-gradient-to-b from-[#C84B31] to-[#A33B24] text-white text-3xl font-bold rounded-3xl border-4 border-[#ECDBBA] flex items-center justify-center active:translate-y-1 transition-all">🚀</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx.roundRect) {
+      ctx.roundRect = function (x, y, width, height, radius) {
+        if (typeof radius === 'undefined') radius = 0;
+        if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
+        else if (Array.isArray(radius)) radius = {tl: radius[0] || 0, tr: radius[1] || 0, br: radius[2] || 0, bl: radius[3] || 0};
+        this.beginPath();
+        this.moveTo(x + radius.tl, y);
+        this.lineTo(x + width - radius.tr, y);
+        this.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+        this.lineTo(x + width, y + height - radius.br);
+        this.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+        this.lineTo(x + radius.bl, y + height);
+        this.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+        this.lineTo(x, y + radius.tl);
+        this.quadraticCurveTo(x, y, x + radius.tl, y);
+        this.closePath();
+        return this;
+      };
+    }
+
+    let animationId = null;
+    let audioCtx = null;
+    let isBgmEnabled = true;
+    let bgmIntervalId = null;
+    let currentBgmNoteIndex = 0;
+
+    const bgmMelody = [261.63, 293.66, 329.63, 392.00, 329.63, 392.00, 440.00, 392.00, 329.63, 329.63, 293.66, 261.63, 293.66, 261.63, 329.63, 392.00, 392.00, 440.00, 523.25, 440.00, 392.00, 329.63, 293.66, 261.63];
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    function toggleBGM() {
+      const actx = getAudioContext();
+      if (actx.state === 'suspended') actx.resume();
+      isBgmEnabled = !isBgmEnabled;
+      const btn = document.getElementById('bgmToggleBtn');
+      if (isBgmEnabled) {
+        btn.innerText = "🔊 เปิดอยู่";
+        btn.className = "bg-[#C84B31] hover:bg-[#A33B24] text-white font-bold py-1 px-4 rounded-xl shadow-md transition-all active:scale-95";
+        startBGM();
+      } else {
+        btn.innerText = "🔇 ปิดอยู่";
+        btn.className = "bg-slate-500 hover:bg-slate-600 text-white font-bold py-1 px-4 rounded-xl shadow-md transition-all active:scale-95";
+        stopBGM();
+      }
+    }
+
+    function playBgmStep() {
+      const actx = getAudioContext();
+      if (!isBgmEnabled || actx.state === 'suspended' || !state.isGameRunning) return;
+      const now = actx.currentTime;
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(bgmMelody[currentBgmNoteIndex] * 0.5, now);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.4);
+      currentBgmNoteIndex = (currentBgmNoteIndex + 1) % bgmMelody.length;
+    }
+
+    function startBGM() {
+      stopBGM();
+      if (isBgmEnabled) bgmIntervalId = setInterval(playBgmStep, 450);
+    }
+    function stopBGM() {
+      if (bgmIntervalId) { clearInterval(bgmIntervalId); bgmIntervalId = null; }
+    }
+
+    function playSound(type) {
+      const actx = getAudioContext();
+      if (actx.state === 'suspended') actx.resume();
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      const now = actx.currentTime;
+
+      if (type === 'jump') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(650, now + 0.16);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+        osc.start(now); osc.stop(now + 0.16);
+      } else if (type === 'correct') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now); osc.stop(now + 0.35);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now); osc.stop(now + 0.35);
+      } else if (type === 'victory') {
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const oscSeq = actx.createOscillator();
+          const gainSeq = actx.createGain();
+          oscSeq.connect(gainSeq); gainSeq.connect(actx.destination);
+          oscSeq.type = 'sine';
+          oscSeq.frequency.setValueAtTime(freq, now + idx * 0.1);
+          gainSeq.gain.setValueAtTime(0.2, now + idx * 0.1);
+          gainSeq.gain.exponentialRampToValueAtTime(0.01, now + (idx + 1.2) * 0.1);
+          oscSeq.start(now + idx * 0.1); oscSeq.stop(now + (idx + 1.2) * 0.1);
+        });
+      } else if (type === 'star') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(1760, now + 0.12);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now); osc.stop(now + 0.15);
+      }
+    }
+
+    // --- ข้อสอบสมการ ม.1 (4 ตัวเลือก) ---
+    const QUESTIONS = [
+      { q: "ถ้า x + 8 = 15 แล้ว x มีค่าเท่าใด?", choices: ["5", "6", "7", "9"], correct: 2, explanation: "ย้าย 8 ไปลบ: x = 15 - 8 ดังนั้น x = 7" },
+      { q: "จงหาค่าของ y จากสมการ y - 12 = 5", choices: ["17", "7", "10", "15"], correct: 0, explanation: "ย้าย 12 ไปบวก: y = 5 + 12 ดังนั้น y = 17" },
+      { q: "ถ้า 3a = 24 แล้ว a มีค่าเท่าใด?", choices: ["6", "7", "8", "9"], correct: 2, explanation: "ย้าย 3 ไปหาร: a = 24 / 3 ดังนั้น a = 8" },
+      { q: "จงหาค่า m จากสมการ m / 4 = 6", choices: ["20", "22", "24", "26"], correct: 2, explanation: "ย้าย 4 ไปคูณ: m = 6 * 4 ดังนั้น m = 24" },
+      { q: "ถ้า 2x + 5 = 17 แล้ว x มีค่าเท่าใด?", choices: ["5", "6", "7", "8"], correct: 1, explanation: "ย้าย 5 ไปลบเหลือ 12 แล้วย้าย 2 ไปหาร: x = 12 / 2 ดังนั้น x = 6" },
+      { q: "จงหาค่า y จาก 3y - 4 = 11", choices: ["3", "4", "5", "6"], correct: 2, explanation: "ย้าย 4 ไปบวกได้ 15 ย้าย 3 ไปหาร: y = 15 / 3 ดังนั้น y = 5" },
+      { q: "จากสมการ x / 2 + 3 = 8 ค่าของ x คือข้อใด?", choices: ["8", "9", "10", "12"], correct: 2, explanation: "ย้าย 3 ไปลบเหลือ 5 แล้วย้าย 2 ไปคูณ: x = 5 * 2 ดังนั้น x = 10" },
+      { q: "ถ้า 4(m - 2) = 16 แล้ว m มีค่าเท่าใด?", choices: ["4", "5", "6", "7"], correct: 2, explanation: "ย้าย 4 ไปหารเหลือ 4 แล้วย้าย 2 ไปบวก: m = 4 + 2 ดังนั้น m = 6" },
+      { q: "จงแก้สมการ 2x + 3x = 25", choices: ["4", "5", "6", "7"], correct: 1, explanation: "รวมพจน์: 5x = 25 ย้าย 5 ไปหาร: x = 25 / 5 ดังนั้น x = 5" },
+      { q: "จงแก้สมการ 7y - 2y = 30", choices: ["4", "5", "6", "7"], correct: 2, explanation: "รวมพจน์: 5y = 30 ย้าย 5 ไปหาร: y = 30 / 5 ดังนั้น y = 6" },
+      { q: "ถ้า x + 5 = 2x - 3 แล้ว x มีค่าเท่าใด?", choices: ["7", "8", "9", "10"], correct: 1, explanation: "ย้าย x ไปฝั่งเดียวกัน: 5 + 3 = 2x - x ดังนั้น 8 = x" },
+      { q: "จงหาค่า a จาก 3(a + 1) = 15", choices: ["3", "4", "5", "6"], correct: 1, explanation: "นำ 3 ไปหารเหลือ 5 แล้วย้าย 1 ไปลบ: a = 5 - 1 ดังนั้น a = 4" },
+      { q: "จากสมการ 2x / 3 = 8 ค่าของ x คือ?", choices: ["10", "11", "12", "14"], correct: 2, explanation: "ย้าย 3 ไปคูณได้ 24 ย้าย 2 ไปหาร: x = 24 / 2 ดังนั้น x = 12" },
+      { q: "จงแก้สมการ 5 - x = 2", choices: ["1", "2", "3", "4"], correct: 2, explanation: "ย้าย x ไปบวกและย้าย 2 ไปลบ: 5 - 2 = x ดังนั้น x = 3" },
+      { q: "จากสมการ 10 = 2m - 4 ค่าของ m คือ?", choices: ["5", "6", "7", "8"], correct: 2, explanation: "ย้าย 4 ไปบวกได้ 14 ย้าย 2 ไปหาร: m = 14 / 2 ดังนั้น m = 7" },
+      { q: "ถ้า 0.5x = 10 แล้ว x มีค่าเท่าใด?", choices: ["15", "18", "20", "25"], correct: 2, explanation: "0.5 คือ 1/2 ย้าย 2 ไปคูณ: x = 10 * 2 ดังนั้น x = 20" },
+      { q: "จงแก้สมการ 4y + 1 = 2y + 9", choices: ["3", "4", "5", "6"], correct: 1, explanation: "ย้าย 2y ไปลบ และ 1 ไปลบ: 2y = 8 ย้าย 2 ไปหาร y = 4" },
+      { q: "ถ้า (x - 1) / 2 = 4 แล้ว x มีค่าเท่าใด?", choices: ["7", "8", "9", "10"], correct: 2, explanation: "ย้าย 2 ไปคูณได้ 8 ย้าย 1 ไปบวก: x = 8 + 1 ดังนั้น x = 9" },
+      { q: "ค่าของ x ที่ทำให้สมการ 2(x + 3) = 14 เป็นจริงคือ?", choices: ["3", "4", "5", "6"], correct: 1, explanation: "ย้าย 2 ไปหารเหลือ 7 ย้าย 3 ไปลบ: x = 7 - 3 ดังนั้น x = 4" },
+      { q: "ข้อใดเป็นคำตอบของสมการ 3x - 5 = x + 7", choices: ["5", "6", "7", "8"], correct: 1, explanation: "ย้าย x ไปลบเหลือ 2x ย้าย 5 ไปบวกได้ 12: 2x = 12 ดังนั้น x = 6" }
+    ];
+
+    const state = {
+      playerName: "นักสืบฝึกหัด", avatar: "🕵️", score: 0, bonusStars: 0, hearts: 3,
+      isGameRunning: false, isQuestionActive: false, currentQuestionIdx: null, currentQuestionItemRef: null,
+      keys: { left: false, right: false, jump: false },
+      cameraX: 0, levelWidth: 8000, levelHeight: 600,
+      checkpoint: { x: 100, y: 300 }
+    };
+
+    const player = {
+      x: 100, y: 300, width: 42, height: 50, vx: 0, vy: 0, speed: 6.0,
+      gravityUp: 0.38, gravityDown: 0.85, jumpForce: -13.0, isGrounded: false,
+      scaleX: 1, scaleY: 1, coyoteCounter: 0, coyoteMax: 9, jumpBufferCounter: 0, jumpBufferMax: 11
+    };
+
+    let platforms = [], mushrooms = [], collectibleStars = [], backgroundLayers = [], particles = [], finishLine = { x: 7800, y: 300, width: 60, height: 200 };
+
+    document.getElementById('playerNameInput').addEventListener('input', (e) => {
+      let val = e.target.value.trim();
+      document.getElementById('previewName').innerText = val !== "" ? val : "นักสืบฝึกหัด";
+    });
+
+    function selectAvatar(symbol) {
+      state.avatar = symbol;
+      document.getElementById('previewHat').innerText = symbol;
+      getAudioContext();
+      document.querySelectorAll('.avatar-select-btn').forEach(btn => {
+        btn.classList.remove('border-[#C84B31]', 'bg-[#F2EDD7]', 'scale-110');
+        btn.classList.add('border-transparent', 'bg-white');
+      });
+      const buttons = document.querySelectorAll('.avatar-select-btn');
+      buttons.forEach(btn => {
+        if(btn.innerText === symbol) btn.className = "avatar-select-btn text-2xl p-2.5 bg-[#F2EDD7] rounded-2xl border-4 border-[#C84B31] scale-110 transition-all transform hover:scale-105 active:scale-90";
+      });
+    }
+
+    function initParallax() {
+      backgroundLayers = [
+        { x: 0, speedMult: 0.04, color: '#2D4263' }, 
+        { x: 0, speedMult: 0.12, color: '#111122' }  
+      ];
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      state.levelHeight = canvas.height;
+    }
+
+    function checkDeviceType() {
+      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      const controls = document.getElementById('touchControls');
+      if (isTouchDevice) controls.classList.remove('hidden');
+      else controls.classList.add('hidden');
+    }
+
+    function generateLevel() {
+      platforms = []; mushrooms = []; collectibleStars = []; particles = [];
+      const screenH = canvas.height;
+      const baseGroundY = screenH - 120;
+      platforms.push({ x: 0, y: baseGroundY, width: 850, height: 200, type: 'ground' });
+      state.checkpoint.x = 150; state.checkpoint.y = baseGroundY - player.height;
+
+      let currentX = 850; let qIndex = 0;
+      while (currentX < 7600 && qIndex < QUESTIONS.length) {
+        if (Math.random() < 0.22) currentX += 120 + Math.random() * 70;
+        const platformWidth = 260 + Math.random() * 210;
+        let platformY = baseGroundY + (Math.random() - 0.5) * 170;
+        if (platformY < screenH * 0.42) platformY = screenH * 0.42;
+        if (platformY > screenH - 110) platformY = screenH - 110;
+
+        platforms.push({ x: currentX, y: platformY, width: platformWidth, height: 350, type: Math.random() > 0.55 ? 'wood' : 'ground' });
+
+        if (qIndex < QUESTIONS.length) {
+          mushrooms.push({
+            x: currentX + platformWidth / 2 - 16, y: platformY - 55, width: 32, height: 32,
+            questionIndex: qIndex, bobOffset: Math.random() * Math.PI * 2, collected: false
+          });
+          qIndex++;
+        }
+
+        const starCount = 2 + Math.floor(Math.random() * 2);
+        for (let s = 0; s < starCount; s++) {
+          collectibleStars.push({
+            x: currentX + (platformWidth / (starCount + 1)) * (s + 1),
+            y: platformY - 90 - Math.sin(s * Math.PI / 2) * 50,
+            width: 20, height: 20, collected: false, phase: Math.random() * Math.PI * 2
+          });
+        }
+        currentX += platformWidth;
+      }
+      platforms.push({ x: currentX, y: baseGroundY - 20, width: 600, height: 220, type: 'ground' });
+      finishLine.x = currentX + 250; finishLine.y = baseGroundY - 200;
+      state.levelWidth = currentX + 600;
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x; this.y = y; this.vx = (Math.random() - 0.5) * 6; this.vy = (Math.random() - 0.5) * 6 - 2.5;
+        this.size = Math.random() * 7 + 4; this.alpha = 1; this.decay = Math.random() * 0.025 + 0.008;
+        this.color = color; this.angle = Math.random() * Math.PI * 2; this.spin = (Math.random() - 0.5) * 0.1;
+      }
+      update() { this.x += this.vx; this.y += this.vy; this.vy += 0.08; this.angle += this.spin; this.alpha -= this.decay; }
+      draw(c) {
+        c.save(); c.globalAlpha = this.alpha; c.fillStyle = this.color; c.translate(this.x, this.y);
+        c.rotate(this.angle); c.beginPath(); c.fillRect(-this.size/2, -this.size/2, this.size, this.size); c.restore();
+      }
+    }
+
+    function createDustParticles(x, y) {
+      for (let i = 0; i < 9; i++) {
+        const p = new Particle(x, y, '#ECDBBA');
+        p.vy = (Math.random() - 0.5) * 2; p.vx = (Math.random() - 0.5) * 4; p.size = Math.random() * 5 + 2;
+        particles.push(p);
+      }
+    }
+
+    function createCelebrationParticles(x, y) {
+      const colors = ['#C84B31', '#ECDBBA', '#F2EDD7', '#2D4263'];
+      for (let i = 0; i < 45; i++) {
+        const p = new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]);
+        p.vx = (Math.random() - 0.5) * 14; p.vy = (Math.random() - 0.5) * 14 - 5;
+        particles.push(p);
+      }
+    }
+
+    function createDamageParticles(x, y) {
+      const colors = ['#C84B31', '#A33B24', '#FFFFFF'];
+      for (let i = 0; i < 22; i++) {
+        const p = new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]);
+        p.vx = (Math.random() - 0.5) * 11; p.vy = (Math.random() - 0.5) * 11 - 2.5;
+        particles.push(p);
+      }
+    }
+
+    function gameLoop() {
+      if (!state.isGameRunning) return;
+      if (!state.isQuestionActive) { updatePhysics(); checkCollisions(); }
+      drawGame();
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    function updatePhysics() {
+      let targetVx = 0;
+      if (state.keys.left) targetVx = -player.speed;
+      if (state.keys.right) targetVx = player.speed;
+      player.vx += (targetVx - player.vx) * 0.28;
+
+      if (player.isGrounded) player.coyoteCounter = player.coyoteMax;
+      else if (player.coyoteCounter > 0) player.coyoteCounter--;
+
+      if (state.keys.jump) { player.jumpBufferCounter = player.jumpBufferMax; state.keys.jump = false; }
+      else if (player.jumpBufferCounter > 0) player.jumpBufferCounter--;
+
+      if (player.jumpBufferCounter > 0 && player.coyoteCounter > 0) {
+        player.vy = player.jumpForce; player.isGrounded = false;
+        player.coyoteCounter = 0; player.jumpBufferCounter = 0; playSound('jump');
+        player.scaleX = 0.75; player.scaleY = 1.35;
+        createDustParticles(player.x + player.width / 2, player.y + player.height);
+      }
+
+      player.vy += player.vy > 0 ? player.gravityDown : player.gravityUp;
+      player.x += player.vx; player.y += player.vy;
+      player.scaleX += (1 - player.scaleX) * 0.16; player.scaleY += (1 - player.scaleY) * 0.16;
+
+      const idealCamX = player.x - canvas.width / 3.2;
+      state.cameraX += (idealCamX - state.cameraX) * 0.08;
+      if (state.cameraX < 0) state.cameraX = 0;
+      if (state.cameraX > state.levelWidth - canvas.width) state.cameraX = state.levelWidth - canvas.width;
+
+      particles.forEach(p => p.update()); particles = particles.filter(p => p.alpha > 0);
+
+      const progress = (player.x / state.levelWidth) * 100;
+      document.getElementById('progressBarFill').style.width = `${Math.min(Math.max(progress, 0), 100)}%`;
+      document.getElementById('progressAvatar').style.left = `calc(${Math.min(Math.max(progress, 0), 100)}% - 14px)`;
+    }
+
+    function checkCollisions() {
+      const pLeft = player.x + 8, pRight = player.x + player.width - 8, pBottom = player.y + player.height, pTop = player.y;
+      let groundedThisFrame = false;
+
+      for (let p of platforms) {
+        if (pRight > p.x && pLeft < p.x + p.width && pBottom >= p.y && pTop < p.y + p.height) {
+          if (player.vy > 0 && pBottom - player.vy <= p.y + 4) {
+            player.y = p.y - player.height; player.vy = 0; groundedThisFrame = true;
+            if (p.type === 'ground' || p.type === 'wood') {
+              state.checkpoint.x = p.x + p.width / 2; state.checkpoint.y = p.y - player.height - 10;
+            }
+            if (!player.isGrounded) {
+              player.scaleX = 1.3; player.scaleY = 0.78;
+              createDustParticles(player.x + player.width / 2, player.y + player.height);
+            }
+          }
+        }
+      }
+      player.isGrounded = groundedThisFrame;
+
+      if (player.y > canvas.height + 200) handlePlayerFall();
+
+      for (let m of mushrooms) {
+        if (!m.collected && Math.abs((player.x + player.width / 2) - (m.x + m.width / 2)) < 33 && Math.abs((player.y + player.height / 2) - (m.y + m.height / 2)) < 33) {
+          m.collected = true; state.currentQuestionItemRef = m; openQuestionModal(m.questionIndex); break;
+        }
+      }
+
+      for (let s of collectibleStars) {
+        if (!s.collected && Math.abs((player.x + player.width / 2) - s.x) < 26 && Math.abs((player.y + player.height / 2) - s.y) < 26) {
+          s.collected = true; state.bonusStars++; playSound('star');
+          for (let i = 0; i < 10; i++) particles.push(new Particle(s.x, s.y, '#ECDBBA'));
+          updateHUD();
+        }
+      }
+
+      if (Math.abs((player.x + player.width / 2) - (finishLine.x + finishLine.width / 2)) < 55 && Math.abs((player.y + player.height / 2) - (finishLine.y + finishLine.height / 2)) < 155) handleVictory();
+    }
+
+    function handlePlayerFall() {
+      state.hearts--; updateHUD(); playSound('wrong');
+      createDamageParticles(player.x + player.width / 2, player.y + player.height / 2);
+      if (state.hearts <= 0) handleGameOver();
+      else { player.x = state.checkpoint.x; player.y = state.checkpoint.y; player.vx = 0; player.vy = 0; player.isGrounded = true; }
+    }
+
+    function handleGameOver() {
+      state.isGameRunning = false; stopBGM();
+      document.getElementById('gameOverScore').innerText = `📁 ${state.score} / ${QUESTIONS.length} คดี`;
+      document.getElementById('gameOverStars').innerText = `🔎 ${state.bonusStars} จุด`;
+      document.getElementById('gameOverMenu').classList.remove('hidden');
+    }
+
+    function handleVictory() {
+      state.isGameRunning = false; stopBGM(); playSound('victory');
+      createCelebrationParticles(player.x, player.y - 45);
+      document.getElementById('victoryPlayerName').innerText = state.playerName;
+      document.getElementById('victoryScore').innerText = `📁 ${state.score} / ${QUESTIONS.length} ข้อ`;
+      document.getElementById('victoryBonusStars').innerText = `🔎 ${state.bonusStars} จุด`;
+      document.getElementById('victoryMenu').classList.remove('hidden');
+    }
+
+    function openQuestionModal(index) {
+      state.isQuestionActive = true; state.currentQuestionIdx = index;
+      const q = QUESTIONS[index];
+      document.getElementById('questionIndexText').innerText = `คดีที่ ${index + 1}/${QUESTIONS.length}`;
+      document.getElementById('questionText').innerText = q.q;
+      
+      // จัดการ 4 ตัวเลือก
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`choice${i}`);
+        document.getElementById(`choice${i}Text`).innerText = q.choices[i];
+        btn.disabled = false;
+        btn.className = "choice-btn w-full text-left md:text-lg font-bold px-4 py-3 rounded-3xl border-4 border-[#ECDBBA] hover:border-[#C84B31] hover:bg-[#F2EDD7] transition-all flex items-center gap-3 bg-white text-[#1A1A2E] shadow-sm active:scale-95";
+      }
+      
+      document.getElementById('explanationBanner').className = "hidden rounded-3xl p-4 text-sm font-bold transition-all";
+      document.getElementById('questionOverlay').classList.remove('hidden');
+    }
+
+    function submitAnswer(choiceIndex) {
+      const q = QUESTIONS[state.currentQuestionIdx];
+      // ปิดปุ่มทั้ง 4 เมื่อตอบแล้ว
+      for (let i = 0; i < 4; i++) document.getElementById(`choice${i}`).disabled = true;
+      
+      const explanationBanner = document.getElementById('explanationBanner');
+      const titleEl = document.getElementById('explanationTitle');
+      const descEl = document.getElementById('explanationDesc');
+
+      if (choiceIndex === q.correct) {
+        playSound('correct'); state.score++; updateHUD();
+        createCelebrationParticles(player.x + player.width / 2, player.y - 25);
+        document.getElementById(`choice${q.correct}`).className = "choice-btn w-full text-left md:text-lg font-black px-4 py-3 rounded-3xl border-4 border-[#2D4263] bg-[#ECDBBA] text-[#1A1A2E] flex items-center gap-3 shadow-md transform scale-105 transition-all";
+        titleEl.innerText = "🌟 เฉียบขาดมากยอดนักสืบ! 🌟"; descEl.innerText = q.explanation;
+        explanationBanner.className = "mt-4 bg-[#F2EDD7] text-[#2D4263] border-2 border-[#ECDBBA] rounded-3xl p-4 block text-left transform scale-100 transition-transform";
+      } else {
+        playSound('wrong'); createDamageParticles(player.x + player.width / 2, player.y - 25);
+        document.getElementById(`choice${choiceIndex}`).className = "choice-btn w-full text-left md:text-lg font-black px-4 py-3 rounded-3xl border-4 border-[#C84B31] bg-[#FADCD5] text-[#A33B24] flex items-center gap-3 shadow-md shake-animation transition-all";
+        document.getElementById(`choice${q.correct}`).className = "choice-btn w-full text-left md:text-lg font-bold px-4 py-3 rounded-3xl border-4 border-[#2D4263] bg-[#ECDBBA] text-[#1A1A2E] flex items-center gap-3 shadow-sm";
+        titleEl.innerText = "🧠 พลาดไปนิดเดียว! ดูแฟ้มเฉลยกัน 🧠"; descEl.innerText = q.explanation;
+        explanationBanner.className = "mt-4 bg-[#FADCD5] text-[#A33B24] border-2 border-[#C84B31] rounded-3xl p-4 block text-left transform scale-100 transition-transform";
+      }
+      setTimeout(() => {
+        document.getElementById('questionOverlay').classList.add('hidden');
+        state.isQuestionActive = false;
+        if (state.currentQuestionItemRef) { mushrooms = mushrooms.filter(item => item !== state.currentQuestionItemRef); state.currentQuestionItemRef = null; }
+      }, 2500);
+    }
+
+    function drawGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      skyGrad.addColorStop(0, '#0F0F1A'); skyGrad.addColorStop(0.6, '#1A1A2E'); skyGrad.addColorStop(1, '#2D4263');
+      ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // พระจันทร์
+      ctx.fillStyle = 'rgba(236, 219, 186, 0.8)';
+      ctx.beginPath(); ctx.arc(canvas.width - 200, 150, 70, 0, Math.PI * 2); ctx.fill();
+
+      backgroundLayers.forEach((layer) => {
+        ctx.fillStyle = layer.color; ctx.beginPath();
+        const startY = canvas.height - 100; ctx.moveTo(0, canvas.height);
+        for (let x = 0; x < canvas.width; x += 40) {
+          const worldX = x + state.cameraX * layer.speedMult;
+          // วาดตึกแทนภูเขา
+          const y = startY - (Math.abs(Math.sin(worldX * 0.005)) * 100) - 50; 
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(canvas.width, canvas.height); ctx.fill();
+      });
+
+      ctx.save(); ctx.translate(-state.cameraX, 0);
+
+      platforms.forEach(p => {
+        if (p.x + p.width > state.cameraX - 100 && p.x < state.cameraX + canvas.width + 100) {
+          if (p.type === 'ground') {
+            ctx.fillStyle = '#1A1A2E'; // ถนนสีเข้ม
+            ctx.beginPath(); ctx.roundRect(p.x, p.y, p.width, p.height, 16); ctx.fill();
+            ctx.fillStyle = '#2D4263'; // ขอบทางเท้า
+            ctx.beginPath(); ctx.roundRect(p.x, p.y, p.width, 16, [16, 16, 0, 0]); ctx.fill();
+          } else if (p.type === 'wood') {
+            ctx.fillStyle = '#C84B31'; ctx.fillRect(p.x, p.y, p.width, 18);
+            ctx.fillStyle = '#ECDBBA'; const boardW = 28;
+            for (let bx = p.x + 6; bx < p.x + p.width; bx += 38) {
+              ctx.beginPath(); ctx.roundRect(bx, p.y - 4, boardW, 23, 6); ctx.fill();
+            }
+          }
+        }
+      });
+
+      collectibleStars.forEach(s => {
+        if (!s.collected && s.x > state.cameraX - 50 && s.x < state.cameraX + canvas.width + 50) {
+          const spin = Math.sin(Date.now() * 0.004 + s.phase) * 4;
+          ctx.save(); ctx.translate(s.x, s.y + spin);
+          ctx.font = '28px Mali'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🔎', 0, 0); ctx.restore();
+        }
+      });
+
+      mushrooms.forEach(m => {
+        const bob = Math.sin(Date.now() * 0.005 + m.bobOffset) * 6;
+        ctx.save(); ctx.translate(m.x + m.width/2, m.y + m.height/2 + bob);
+        ctx.font = '36px Mali'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('📁', 0, 0); ctx.restore();
+      });
+
+      if (finishLine.x > state.cameraX - 200 && finishLine.x < state.cameraX + canvas.width + 100) {
+        ctx.fillStyle = '#ECDBBA'; ctx.fillRect(finishLine.x, finishLine.y, 10, finishLine.height);
+        const wave = Math.sin(Date.now() * 0.005) * 10;
+        ctx.fillStyle = '#C84B31'; ctx.beginPath();
+        ctx.moveTo(finishLine.x + 10, finishLine.y); ctx.lineTo(finishLine.x + 130, finishLine.y + 30 + wave); ctx.lineTo(finishLine.x + 10, finishLine.y + 60); ctx.closePath(); ctx.fill();
+        ctx.font = '28px Mali'; ctx.fillText('🏆', finishLine.x + 30, finishLine.y + 38);
+      }
+
+      ctx.save(); ctx.translate(player.x + player.width / 2, player.y + player.height); ctx.scale(player.scaleX, player.scaleY);
+      ctx.fillStyle = '#ECDBBA'; ctx.beginPath(); ctx.roundRect(-player.width / 2, -player.height, player.width, player.height, 16); ctx.fill();
+      ctx.fillStyle = '#1A1A2E'; ctx.beginPath(); ctx.arc(-9, -player.height + 20, 5, 0, Math.PI * 2); ctx.arc(9, -player.height + 20, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(-10.5, -player.height + 18.5, 2, 0, Math.PI * 2); ctx.arc(7.5, -player.height + 18.5, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#1A1A2E'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, -player.height + 26, 5, 0, Math.PI); ctx.stroke();
+      ctx.font = '28px Mali'; ctx.fillText(state.avatar, -18, -player.height + 8);
+      ctx.restore();
+
+      particles.forEach(p => p.draw(ctx)); ctx.restore();
+    }
+
+    function updateHUD() {
+      document.getElementById('hudPlayerName').innerText = state.playerName;
+      document.getElementById('hudAvatar').innerText = state.avatar;
+      document.getElementById('hudScore').innerText = `${state.score} / ${QUESTIONS.length}`;
+      document.getElementById('hudStarsCount').innerText = `🔎 ${state.bonusStars}`;
+      const heartsContainer = document.getElementById('hudHearts'); heartsContainer.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        if (i < state.hearts) heartsContainer.innerHTML += '<span class="heart-active text-xl inline-block" style="animation-delay: ' + (i * 0.2) + 's">❤️</span>';
+        else heartsContainer.innerHTML += '<span class="text-xl inline-block opacity-45">🖤</span>';
+      }
+    }
+
+    const nameInput = document.getElementById('playerNameInput'); let isInputFocused = false;
+    nameInput.addEventListener('focus', () => { isInputFocused = true; }); nameInput.addEventListener('blur', () => { isInputFocused = false; });
+    window.addEventListener('keydown', (e) => {
+      if (isInputFocused) return;
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') state.keys.left = true;
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') state.keys.right = true;
+      if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') { state.keys.jump = true; if (e.code === 'Space') e.preventDefault(); }
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') state.keys.left = false;
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') state.keys.right = false;
+    });
+
+    const btnLeft = document.getElementById('btnLeft'), btnRight = document.getElementById('btnRight'), btnJump = document.getElementById('btnJump');
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); state.keys.left = true; }); btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); state.keys.left = false; });
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); state.keys.right = true; }); btnRight.addEventListener('touchend', (e) => { e.preventDefault(); state.keys.right = false; });
+    btnJump.addEventListener('touchstart', (e) => { e.preventDefault(); state.keys.jump = true; });
+    btnLeft.addEventListener('mousedown', () => state.keys.left = true); btnLeft.addEventListener('mouseup', () => state.keys.left = false);
+    btnRight.addEventListener('mousedown', () => state.keys.right = true); btnRight.addEventListener('mouseup', () => state.keys.right = false);
+    btnJump.addEventListener('mousedown', () => state.keys.jump = true);
+
+    function startGame() {
+      getAudioContext(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      const inputName = document.getElementById('playerNameInput').value.trim(); state.playerName = inputName !== "" ? inputName : "นักสืบฝึกหัด";
+      document.getElementById('startMenu').classList.add('hidden'); document.getElementById('victoryMenu').classList.add('hidden'); document.getElementById('gameOverMenu').classList.add('hidden');
+      resizeCanvas(); checkDeviceType(); generateLevel();
+      player.x = 100; player.y = canvas.height - 200; player.vx = 0; player.vy = 0; player.isGrounded = true;
+      state.score = 0; state.bonusStars = 0; state.hearts = 3; state.cameraX = 0; state.isQuestionActive = false;
+      initParallax(); updateHUD(); state.isGameRunning = true; startBGM();
+      if (animationId) cancelAnimationFrame(animationId); gameLoop();
+    }
+    function restartGame() { startGame(); }
+    window.addEventListener('resize', () => { if (state.isGameRunning) { resizeCanvas(); checkDeviceType(); } });
+    document.getElementById('btnStart').addEventListener('click', startGame);
+    function hybridBoot() {
+      if (document.readyState === 'complete' || document.readyState === 'interactive') { resizeCanvas(); checkDeviceType(); }
+      else { document.addEventListener('DOMContentLoaded', () => { resizeCanvas(); checkDeviceType(); }); }
+    }
+    hybridBoot();
+  </script>
+</body>
+</html>
