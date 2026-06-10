@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ยอดนักสืบสมการ</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕵️</text></svg>">
+  <title>หน้าแรก - ยอดนักสืบสมการ ม.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
       font-family: 'Mali', cursive;
       user-select: none;
       -webkit-user-select: none;
-      overflow: hidden;
+      /* เอา overflow: hidden ออก เพื่อให้เปิดสิทธิ์การเลื่อนหน้าจอบนมือถือ */
     }
     @keyframes floating {
       0%, 100% { transform: translateY(0); }
@@ -40,13 +40,13 @@
     .cloud-slow { animation: drift 100s linear infinite; }
   </style>
 </head>
-<body class="w-screen h-screen flex flex-col justify-center items-center relative bg-gradient-to-br from-[#2D4263] via-[#1A1A2E] to-[#C84B31]">
+<body class="w-screen min-h-screen flex flex-col justify-start sm:justify-center items-center relative bg-gradient-to-br from-[#2D4263] via-[#1A1A2E] to-[#C84B31] overflow-y-auto overflow-x-hidden p-4 pt-8 pb-24 sm:py-6">
 
-  <div class="absolute top-10 left-[-200px] cloud-slow opacity-20 text-6xl">☁️</div>
-  <div class="absolute top-32 left-[-400px] cloud-slow opacity-10 text-8xl" style="animation-delay: -25s; animation-duration: 85s;">☁️</div>
-  <div class="absolute top-[10%] right-[15%] w-24 h-24 bg-[#ECDBBA] rounded-full opacity-80 shadow-[0_0_40px_rgba(236,219,186,0.6)]"></div>
+  <div class="absolute top-10 left-[-200px] cloud-slow opacity-20 text-6xl pointer-events-none">☁️</div>
+  <div class="absolute top-32 left-[-400px] cloud-slow opacity-10 text-8xl pointer-events-none" style="animation-delay: -25s; animation-duration: 85s;">☁️</div>
+  <div class="absolute top-[10%] right-[15%] w-24 h-24 bg-[#ECDBBA] rounded-full opacity-80 shadow-[0_0_40px_rgba(236,219,186,0.6)] pointer-events-none"></div>
 
-  <div class="bg-white/95 backdrop-blur-md p-8 md:p-10 rounded-[40px] shadow-[0_20px_50px_rgba(200,75,49,0.3)] max-w-2xl w-[90%] border-[8px] border-[#ECDBBA] text-center flex flex-col gap-6 transform transition-all z-10 relative">
+  <div class="bg-white/95 backdrop-blur-md p-6 md:p-10 rounded-[40px] shadow-[0_20px_50px_rgba(200,75,49,0.3)] max-w-2xl w-[95%] sm:w-[90%] border-[8px] border-[#ECDBBA] text-center flex flex-col gap-6 transform transition-all z-10 relative my-auto">
     
     <div class="relative py-2">
       <h1 class="text-4xl md:text-5xl font-black text-[#C84B31] drop-shadow-[0_4px_0_#2D4263] tracking-wide float-animation">
@@ -57,17 +57,17 @@
       </p>
     </div>
 
-    <div class="bg-[#F2EDD7] p-6 rounded-3xl border-4 border-[#2D4263] text-left text-[#1A1A2E] shadow-sm">
+    <div class="bg-[#F2EDD7] p-5 md:p-6 rounded-3xl border-4 border-[#2D4263] text-left text-[#1A1A2E] shadow-sm">
       <h2 class="text-xl md:text-2xl font-bold mb-3 text-[#C84B31] flex items-center gap-2 border-b-2 border-dashed border-[#C84B31] pb-2">
         <span>📜</span> คู่มือการใช้งาน
       </h2>
-      <ul class="space-y-4 font-semibold text-md md:text-lg mt-4">
+      <ul class="space-y-4 font-semibold text-base md:text-lg mt-4">
         <li class="flex items-start gap-3">
-          <span class="mt-0.5 text-2xl">🏢</span> 
+          <span class="mt-0.5 text-xl md:text-2xl">🏢</span> 
           <span>หากต้องการค้นหาข้อมูลและทบทวนความรู้เรื่องสมการ ให้กดที่ปุ่ม <span class="text-[#2D4263] font-black underline decoration-wavy decoration-[#ECDBBA]">"สำนักงานนักสืบสมการ"</span></span>
         </li>
         <li class="flex items-start gap-3">
-          <span class="mt-0.5 text-2xl">🔎</span> 
+          <span class="mt-0.5 text-xl md:text-2xl">🔎</span> 
           <span>หากพร้อมที่จะไขปริศนาและทดสอบฝีมือแล้ว ให้กดที่ปุ่ม <span class="text-[#C84B31] font-black underline decoration-wavy decoration-[#ECDBBA]">"ออกผจญภัย"</span> เพื่อเริ่มเกม</span>
         </li>
       </ul>
