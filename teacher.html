@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจัดการ - ยอดนักสืบสมการ ม.1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Mali', cursive; }
+    /* Loading Spinner */
+    .loader { border: 4px solid #F2EDD7; border-top: 4px solid #C84B31; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#2D4263] via-[#1A1A2E] to-[#C84B31] min-h-screen flex items-center justify-center p-4">
+
+  <div id="loginSection" class="bg-white p-8 rounded-[40px] shadow-2xl max-w-sm w-full border-[6px] border-[#ECDBBA] text-center transition-all duration-500">
+    <div class="text-6xl mb-4">👨‍🏫</div>
+    <h1 class="text-2xl font-black text-[#2D4263] mb-6">สำหรับคุณครูเท่านั้น</h1>
+    
+    <input type="password" id="passwordInput" placeholder="ใส่รหัสผ่าน..." 
+           class="w-full px-4 py-3 rounded-2xl border-4 border-[#ECDBBA] focus:border-[#C84B31] outline-none text-center text-lg font-bold mb-4">
+    
+    <p id="errorMsg" class="text-red-500 text-sm font-bold hidden mb-4">❌ รหัสผ่านไม่ถูกต้อง!</p>
+    
+    <button onclick="checkLogin()" class="w-full bg-[#C84B31] hover:bg-[#A33B24] text-white font-black py-3 rounded-2xl border-b-4 border-[#752A19] active:border-b-0 active:translate-y-1 transition-all">
+      เข้าสู่ระบบ
+    </button>
+    <a href="index.html" class="block mt-4 text-[#2D4263] font-bold text-sm underline">กลับหน้าแรก</a>
+  </div>
+
+
+  <div id="dashboardSection" class="hidden w-full max-w-5xl flex flex-col items-center">
+    
+    <div class="w-full flex justify-between items-end mb-4">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-black text-[#ECDBBA]">📊 ตารางผลการสืบสวน</h1>
+        <p class="text-[#F2EDD7] font-bold mt-1">ข้อมูลส่งตรงจากสำนักงานนักสืบสมการ</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="fetchData()" class="bg-[#ECDBBA] text-[#2D4263] font-black px-4 py-2 rounded-xl shadow-md hover:bg-white active:scale-95 transition-all flex items-center gap-2">
+          <span>🔄</span> รีเฟรช
+        </button>
+        <button onclick="logout()" class="bg-red-500 text-white font-black px-4 py-2 rounded-xl shadow-md hover:bg-red-600 active:scale-95 transition-all flex items-center gap-2">
+          <span>🚪</span> ออก
+        </button>
+      </div>
+    </div>
+
+    <div class="w-full bg-white rounded-3xl border-4 border-[#ECDBBA] shadow-2xl overflow-hidden">
+      
+      <div id="loadingStatus" class="py-20 flex flex-col items-center justify-center">
+        <div class="loader mb-4"></div>
+        <p class="text-[#2D4263] font-bold text-lg">กำลังซิงค์ข้อมูลจากฐานข้อมูล...</p>
+      </div>
+
+      <div class="overflow-x-auto hidden" id="tableContainer">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#2D4263] text-[#ECDBBA]">
+              <th class="p-4 font-black">เวลาส่งงาน</th>
+              <th class="p-4 font-black">ชื่อรหัสประจำตัว</th>
+              <th class="p-4 font-black text-center">ตัวแทน</th>
+              <th class="p-4 font-black text-center">คดีที่ไขได้</th>
+              <th class="p-4 font-black text-center">เบาะแสลับ</th>
+              <th class="p-4 font-black text-center">ผลการประเมิน</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            </tbody>
+        </table>
+      </div>
+      
+    </div>
+  </div>
+
+  <script>
+    // 🛑 ใส่ Web App URL ของคุณที่นี่ 🛑
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIaBc4WMN73n9G74hSJ5LMEnuk_y6tlpJoWnzqaOhuIbM7AELrBngzz3iDR5kK6iz5-w/exec";
+    
+    // ตั้งรหัสผ่านสำหรับครู
+    const TEACHER_PASSWORD = "123456";
+
+    // ระบบ Login
+    function checkLogin() {
+      const input = document.getElementById('passwordInput').value;
+      if (input === TEACHER_PASSWORD) {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('dashboardSection').classList.remove('hidden');
+        document.getElementById('dashboardSection').classList.add('flex');
+        fetchData(); // ดึงข้อมูลทันทีเมื่อล็อกอินผ่าน
+      } else {
+        document.getElementById('errorMsg').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('errorMsg').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('flex');
+      document.getElementById('loginSection').classList.remove('hidden');
+    }
+
+    // รองรับการกด Enter เพื่อล็อกอิน
+    document.getElementById('passwordInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') checkLogin();
+    });
+
+    // ระบบดึงข้อมูลจาก Google Sheets (GET)
+    async function fetchData() {
+      const tableBody = document.getElementById('studentTableBody');
+      const tableContainer = document.getElementById('tableContainer');
+      const loading = document.getElementById('loadingStatus');
+
+      tableContainer.classList.add('hidden');
+      loading.classList.remove('hidden');
+      tableBody.innerHTML = '';
+
+      try {
+        const response = await fetch(GAS_WEB_APP_URL);
+        const data = await response.json();
+
+        if (data.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-gray-500 font-bold">ยังไม่มีข้อมูลนักเรียน 🕵️‍♂️</td></tr>`;
+        } else {
+          data.forEach((row, index) => {
+            // จัดการรูปแบบวันที่
+            const dateObj = new Date(row.timestamp);
+            const dateStr = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute:'2-digit' });
+            
+            // สีแถวสลับกันเพื่อให้อ่านง่าย
+            const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-[#F2EDD7]/30';
+            
+            // ป้ายสถานะ
+            const statusBadge = row.status === 'ชนะ' 
+              ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-300">🏆 ปิดคดีสำเร็จ</span>` 
+              : `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-300">🩹 เบาะแสหลุดลอย</span>`;
+
+            tableBody.innerHTML += `
+              <tr class="${bgClass} border-b-2 border-gray-100 hover:bg-[#F2EDD7] transition-colors">
+                <td class="p-4 text-sm text-gray-600">${dateStr}</td>
+                <td class="p-4 font-bold text-[#2D4263]">${row.name}</td>
+                <td class="p-4 text-center text-2xl">${row.avatar}</td>
+                <td class="p-4 text-center font-black text-[#C84B31]">${row.score} / 20</td>
+                <td class="p-4 text-center font-bold text-[#2D4263]">🔎 ${row.stars}</td>
+                <td class="p-4 text-center">${statusBadge}</td>
+              </tr>
+            `;
+          });
+        }
+      } catch (error) {
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-500 font-bold">เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล โปรดตรวจสอบ URL</td></tr>`;
+      }
+
+      loading.classList.add('hidden');
+      tableContainer.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
